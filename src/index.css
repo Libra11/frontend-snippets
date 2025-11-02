@@ -114,7 +114,30 @@
   * {
     @apply border-border outline-ring/50;
   }
+  html {
+    @apply h-full;
+  }
   body {
-    @apply bg-background text-foreground;
+    @apply min-h-screen bg-background text-foreground antialiased;
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--ring) 55%, transparent)
+      transparent;
+  }
+  #root {
+    @apply min-h-screen;
+  }
+  *::-webkit-scrollbar {
+    width: 2px;
+    height: 2px;
+  }
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  *::-webkit-scrollbar-thumb {
+    border-radius: 9999px;
+    background-color: color-mix(in srgb, var(--ring) 60%, transparent);
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    background-color: color-mix(in srgb, var(--ring) 80%, transparent);
   }
 }
