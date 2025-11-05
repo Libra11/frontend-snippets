@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Highlight, themes, type Language } from "prism-react-renderer";
 import { Check, Clipboard } from "lucide-react";
 
@@ -9,6 +9,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+import { useTheme } from "@/hooks/use-theme";
 
 type CodeBlockProps = {
   code: string;
@@ -27,9 +28,15 @@ export function CodeBlock({
 }: CodeBlockProps) {
   const formattedCode = code.replace(/\s+$/, "");
   const highlightLanguage = language as Language;
+  const { isDark } = useTheme();
   const [copyStatus, setCopyStatus] = useState<CopyStatus>("idle");
   const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const languageLabel = String(highlightLanguage).toUpperCase();
+
+  const codeTheme = useMemo(
+    () => (isDark ? themes.nightOwl : themes.github),
+    [isDark]
+  );
 
   useEffect(() => {
     return () => {
@@ -101,18 +108,19 @@ export function CodeBlock({
   return (
     <div
       className={cn(
-        "relative overflow-hidden rounded-2xl border border-border/70 bg-card/95",
-        className,
+        "relative overflow-hidden rounded-2xl border border-border/70 bg-card/95 shadow-lg transition-colors",
+        "dark:border-border/40 dark:bg-muted/20",
+        className
       )}
     >
-      <div className="flex items-center justify-between border-b border-border/70 bg-muted/25 px-4 py-2">
+      <div className="flex items-center justify-between border-b border-border/70 bg-muted/25 px-4 py-2 dark:border-border/40 dark:bg-muted/30">
         <div className="flex items-center gap-2">
           <span className="size-3 rounded-full bg-[#ff5f56]" aria-hidden />
           <span className="size-3 rounded-full bg-[#ffbd2e]" aria-hidden />
           <span className="size-3 rounded-full bg-[#27c93f]" aria-hidden />
         </div>
         <div className="flex items-center gap-3">
-          <span className="hidden rounded-full bg-background/80 px-2 py-0.5 text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground sm:inline-flex">
+          <span className="hidden rounded-full bg-background/80 px-2 py-0.5 text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground sm:inline-flex dark:bg-foreground/10 dark:text-muted-foreground">
             {languageLabel}
           </span>
           <Tooltip>
@@ -144,11 +152,7 @@ export function CodeBlock({
           </Tooltip>
         </div>
       </div>
-      <Highlight
-        theme={themes.github}
-        code={formattedCode}
-        language={highlightLanguage}
-      >
+      <Highlight theme={codeTheme} code={formattedCode} language={highlightLanguage}>
         {({
           className: highlightClassName,
           style,
@@ -158,10 +162,14 @@ export function CodeBlock({
         }) => (
           <pre
             className={cn(
-              "flex overflow-auto bg-transparent font-mono text-[12px] py-3",
-              highlightClassName,
+              "flex overflow-auto bg-transparent font-mono text-[12px] py-3 transition-colors",
+              "text-foreground/90 dark:text-foreground/80",
+              highlightClassName
             )}
-            style={style}
+            style={{
+              ...style,
+              backgroundColor: "transparent",
+            }}
           >
             <code className="min-w-full">
               {tokens.map((line, lineIndex) => {
@@ -173,12 +181,13 @@ export function CodeBlock({
                     key={`line-${lineIndex}`}
                     className={cn(
                       "group flex w-full min-w-full gap-3 px-4 py-1",
-                      lineClassName,
+                      "text-foreground/90 dark:text-foreground/80",
+                      lineClassName
                     )}
                     style={lineStyle}
                   >
                     {showLineNumbers && (
-                      <span className="w-8 select-none text-right font-mono text-[11px] text-muted-foreground/60">
+                      <span className="w-8 select-none text-right font-mono text-[11px] text-muted-foreground/60 dark:text-muted-foreground/45">
                         {lineIndex + 1}
                       </span>
                     )}
