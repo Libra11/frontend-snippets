@@ -22,6 +22,8 @@ export default defineConfig([
     rules: {
       // ✅ 关闭 Fast Refresh 警告
       "react-refresh/only-export-components": "off",
+      // 关闭 any 警告
+      "@typescript-eslint/no-explicit-any": "off",
     },
   },
 ]);
