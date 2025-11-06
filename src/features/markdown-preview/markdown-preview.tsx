@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import { isValidElement, useMemo, useState } from "react";
+import type { ReactNode } from "react";
 import ReactMarkdown, { type Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 
@@ -8,7 +9,7 @@ import { cn } from "@/lib/utils";
 
 const DEFAULT_MARKDOWN = [
   "# Markdown 即时预览",
-  "在 React 中把 Markdown 文本渲染成组件，同时保留常见的排版样式。",
+  "在 `React` 中把 Markdown 文本渲染成组件，同时保留常见的排版样式。",
   "",
   "## 快速上手",
   "",
@@ -36,7 +37,41 @@ const DEFAULT_MARKDOWN = [
   "| `code` | 显示命令 |",
   "",
   "[Markdown 基础语法](https://www.markdownguide.org/basic-syntax/)",
+  "",
+  "![image](https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1400&q=80)",
 ].join("\n");
+
+const getCodeContent = (value: ReactNode): string => {
+  if (typeof value === "string") {
+    return value;
+  }
+
+  if (typeof value === "number") {
+    return String(value);
+  }
+
+  if (Array.isArray(value)) {
+    return value.map(getCodeContent).join("");
+  }
+
+  if (isValidElement(value)) {
+    return getCodeContent((value.props as any).children as ReactNode);
+  }
+
+  return "";
+};
+
+const getClassNameString = (value: unknown): string => {
+  if (typeof value === "string") {
+    return value;
+  }
+
+  if (Array.isArray(value)) {
+    return value.filter(Boolean).join(" ");
+  }
+
+  return "";
+};
 
 const markdownComponents: Components = {
   h1: ({ className, children, ...props }) => (
@@ -170,17 +205,20 @@ const markdownComponents: Components = {
       {children}
     </a>
   ),
-  code({ inline, className, children, ...props }: any) {
-    const codeValue = String(children).replace(/\n$/, "");
-    const language = /language-(\w+)/.exec(className ?? "")?.[1];
+  code({ className, children, ...props }) {
+    const codeClassName = getClassNameString(className);
+    const codeValue = getCodeContent(children).replace(/\n$/, "");
+    const language = /language-(\w+)/.exec(codeClassName)?.[1];
+    const isCodeBlock =
+      /language-(\w+)/.test(codeClassName) || codeValue.includes("\n");
 
-    if (inline) {
+    if (!isCodeBlock) {
       return (
         <code
           {...props}
           className={cn(
             "rounded bg-muted px-1.5 py-0.5 font-mono text-xs",
-            className,
+            codeClassName,
           )}
         >
           {children}
@@ -229,7 +267,7 @@ export function MarkdownPreviewSnippet() {
           value={markdown}
           onChange={(event) => setMarkdown(event.target.value)}
           spellCheck={false}
-          className="min-h-[320px] w-full resize-y rounded-2xl border border-border/60 bg-background/80 p-4 font-mono text-sm leading-6 text-foreground shadow-inner focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
+          className="h-full w-full resize-y rounded-2xl border border-border/60 bg-background/80 p-4 font-mono text-sm leading-6 text-foreground shadow-inner focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
         />
 
         <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
