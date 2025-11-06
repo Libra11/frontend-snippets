@@ -3,6 +3,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { ScrollToTopButton } from "@/components/scroll-to-top-button";
 
 export function AppShell({ children }: PropsWithChildren) {
   return (
@@ -68,6 +69,8 @@ export function AppShell({ children }: PropsWithChildren) {
             {children}
           </div>
         </main>
+
+        <ScrollToTopButton />
       </div>
     </TooltipProvider>
   );
