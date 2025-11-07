@@ -1,7 +1,14 @@
+/*
+ * @Author: Libra
+ * @Date: 2025-11-02 20:54:54
+ * @LastEditors: Libra
+ * @Description:
+ */
 import type { SnippetDefinition } from "./types";
 import { CopyToClipboardSnippet } from "./copy-to-clipboard";
 import { DebounceThrottleInputSnippet } from "./debounce-throttle-input";
 import { CountdownTimerSnippet } from "./countdown-timer";
+import { DynamicFormSnippet } from "./dynamic-form";
 import { LazyImageGallerySnippet } from "./image-lazy-load";
 import { MarkdownPreviewSnippet } from "./markdown-preview";
 import { ScrollToTopSnippet } from "./scroll-to-top";
@@ -157,7 +164,8 @@ const run = (value: string) => {
   {
     id: "countdown-worker",
     title: "Web Worker 倒计时",
-    excerpt: "将倒计时逻辑移入 Web Worker，保持主线程繁忙时依然准确的计时体验。",
+    excerpt:
+      "将倒计时逻辑移入 Web Worker，保持主线程繁忙时依然准确的计时体验。",
     keywords: ["倒计时", "Web Worker", "性能"],
     Component: CountdownTimerSnippet,
     detail: {
@@ -236,6 +244,94 @@ const postCommand = (command: CountdownWorkerCommand) => {
       {
         title: "Vite 官方文档：Web Workers",
         url: "https://cn.vitejs.dev/guide/features.html#web-workers",
+      },
+    ],
+  },
+  {
+    id: "dynamic-form",
+    title: "动态配置表单",
+    excerpt:
+      "用配置驱动字段与校验逻辑，结合 shadcn/ui 构建可联动的动态表单界面。",
+    keywords: ["表单", "动态配置", "shadcn"],
+    Component: DynamicFormSnippet,
+    detail: {
+      overview:
+        "通过字段定义数组描述表单结构，每个字段可以携带类型、占位、依赖条件与提示信息。借助 react-hook-form 的 resolver 与 zod superRefine，校验逻辑可以随可见字段即时更新，实现真正可扩展的动态表单。",
+      implementation: [
+        "使用 DynamicFieldDefinition 描述字段元数据（类型、占位、选项、联动条件、校验规则等），统一驱动渲染与校验。",
+        "useWatch 监听表单值变化，实时筛选需要展示的字段，并在右侧面板同步当前结构。",
+        "自定义 resolver 在每次校验前生成 schema，隐藏字段自动跳过校验，已显示字段则执行邮箱、正则、长度等约束。",
+        "提交时仅收集当前可见字段的值，便于传递给后端或保存配置，同时提供快速重置能力。",
+      ],
+      notes: [
+        "可继续扩展 showIf，支持多条件、范围比较或自定义函数，满足复杂的业务联动需求。",
+        "字段定义可由后端或 CMS 下发，实现低代码表单搭建；前端只需渲染与校验。",
+      ],
+    },
+    codeExamples: [
+      {
+        name: "字段配置示例",
+        language: "ts",
+        code: `const fieldDefinitions: DynamicFieldDefinition[] = [
+  {
+    id: "projectName",
+    label: "项目名称",
+    type: "text",
+    required: true,
+    minLength: 3,
+    maxLength: 48,
+  },
+  {
+    id: "budgetRange",
+    label: "预算区间",
+    type: "select",
+    options: [
+      { value: "lt-50k", label: "小于 5 万" },
+      { value: "50-100k", label: "5 万 - 10 万" },
+    ],
+    showIf: { field: "hasBudget", equals: true },
+    required: true,
+  },
+]`,
+      },
+      {
+        name: "动态校验逻辑",
+        language: "ts",
+        code: `const resolver: Resolver<DynamicFormValues> = (values, ctx, options) => {
+  const schema = buildSchema(values)
+  return zodResolver(schema)(values, ctx, options)
+}
+
+function buildSchema(currentValues: DynamicFormValues) {
+  return z.object(schemaShape).superRefine((parsed, ctx) => {
+    fieldDefinitions.forEach((field) => {
+      if (!shouldShowField(currentValues, field)) return
+
+      const value = (parsed[field.id] as string)?.trim?.() ?? ""
+      if (field.required && !value) {
+        ctx.addIssue({
+          code: "custom",
+          path: [field.id],
+          message: field.label + " 为必填项",
+        })
+      }
+    })
+  })
+}`,
+      },
+    ],
+    resources: [
+      {
+        title: "react-hook-form Resolver",
+        url: "https://react-hook-form.com/docs/useform/resolvers",
+      },
+      {
+        title: "Zod 文档",
+        url: "https://zod.dev/",
+      },
+      {
+        title: "shadcn/ui Form 组件",
+        url: "https://ui.shadcn.com/docs/components/form",
       },
     ],
   },
