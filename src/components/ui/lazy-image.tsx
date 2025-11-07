@@ -1,3 +1,9 @@
+/**
+ * Author: Libra
+ * Date: 2025-11-05 16:32:18
+ * LastEditors: Libra
+ * Description:
+ */
 import type { ImgHTMLAttributes } from "react";
 import { useEffect, useRef, useState } from "react";
 
@@ -65,12 +71,16 @@ export function LazyImage({
     };
   }, [isVisible, rootMargin]);
 
-  const handleImageLoad: React.ReactEventHandler<HTMLImageElement> = (event) => {
+  const handleImageLoad: React.ReactEventHandler<HTMLImageElement> = (
+    event
+  ) => {
     setIsLoaded(true);
     onLoad?.(event);
   };
 
-  const handleImageError: React.ReactEventHandler<HTMLImageElement> = (event) => {
+  const handleImageError: React.ReactEventHandler<HTMLImageElement> = (
+    event
+  ) => {
     setIsLoaded(false);
     onError?.(event);
   };
@@ -108,8 +118,10 @@ export function LazyImage({
         onLoad={handleImageLoad}
         onError={handleImageError}
         className={cn(
-          "relative z-[1] h-full w-full object-cover transition ease-out",
-          isLoaded ? "opacity-100 blur-0 scale-100" : "opacity-0 blur-sm scale-[1.02]",
+          "relative z-1 h-full w-full object-cover transition ease-out",
+          isLoaded
+            ? "opacity-100 blur-0 scale-100"
+            : "opacity-0 blur-sm scale-[1.02]",
           className
         )}
         style={{

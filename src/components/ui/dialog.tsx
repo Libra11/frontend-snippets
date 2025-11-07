@@ -1,3 +1,9 @@
+/**
+ * Author: Libra
+ * Date: 2025-11-07 17:50:58
+ * LastEditors: Libra
+ * Description:
+ */
 "use client";
 
 import * as React from "react";
@@ -23,7 +29,7 @@ const DialogOverlay = React.forwardRef<
     className={cn(
       "fixed inset-0 z-50 bg-background/80 backdrop-blur-sm transition-opacity",
       "data-[state=open]:animate-in data-[state=open]:fade-in data-[state=closed]:animate-out data-[state=closed]:fade-out",
-      className,
+      className
     )}
     {...props}
   />
@@ -39,10 +45,10 @@ const DialogContent = React.forwardRef<
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        "fixed left-1/2 top-1/2 z-50 grid w-full max-w-[min(92vw,1100px)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-2xl border border-border/60 bg-card/95 p-6 shadow-2xl outline-none backdrop-blur supports-[backdrop-filter]:bg-card/80",
+        "fixed left-1/2 top-1/2 z-50 grid w-full max-w-[min(92vw,1100px)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-2xl border border-border/60 bg-card/95 p-6 shadow-2xl outline-none backdrop-blur supports-backdrop-filter:bg-card/80",
         "data-[state=open]:animate-in data-[state=open]:fade-in-90 data-[state=open]:zoom-in-90 data-[state=open]:slide-in-from-bottom-4",
         "data-[state=closed]:animate-out data-[state=closed]:fade-out-80 data-[state=closed]:zoom-out-90 data-[state=closed]:slide-out-to-bottom-4",
-        className,
+        className
       )}
       {...props}
     >
@@ -71,7 +77,7 @@ const DialogFooter = ({
   <div
     className={cn(
       "flex flex-col-reverse gap-2 sm:flex-row sm:justify-end",
-      className,
+      className
     )}
     {...props}
   />
@@ -86,7 +92,7 @@ const DialogTitle = React.forwardRef<
     ref={ref}
     className={cn(
       "text-xl font-semibold leading-tight tracking-tight",
-      className,
+      className
     )}
     {...props}
   />

@@ -1,3 +1,9 @@
+/**
+ * Author: Libra
+ * Date: 2025-11-02 20:55:02
+ * LastEditors: Libra
+ * Description:
+ */
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CodeBlock } from "@/components/ui/code-block";
@@ -86,13 +92,19 @@ export function SnippetCard({ snippet }: SnippetCardProps) {
               </h4>
               <div className="mt-3 space-y-5">
                 {snippet.codeExamples.map((example, index) => (
-                  <div key={`${snippet.id}-code-${index}`} className="space-y-2">
+                  <div
+                    key={`${snippet.id}-code-${index}`}
+                    className="space-y-2"
+                  >
                     {example.name && (
                       <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                         {example.name}
                       </p>
                     )}
-                    <CodeBlock code={example.code} language={example.language ?? "tsx"} />
+                    <CodeBlock
+                      code={example.code}
+                      language={example.language ?? "tsx"}
+                    />
                   </div>
                 ))}
               </div>
