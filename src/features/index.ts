@@ -1,6 +1,7 @@
 import type { SnippetDefinition } from "./types";
 import { CopyToClipboardSnippet } from "./copy-to-clipboard";
 import { DebounceThrottleInputSnippet } from "./debounce-throttle-input";
+import { CountdownTimerSnippet } from "./countdown-timer";
 import { LazyImageGallerySnippet } from "./image-lazy-load";
 import { MarkdownPreviewSnippet } from "./markdown-preview";
 import { ScrollToTopSnippet } from "./scroll-to-top";
@@ -150,6 +151,91 @@ const run = (value: string) => {
       {
         title: "Jake Archibald: In defence of throttling",
         url: "https://jakearchibald.com/2016/throttling-and-debouncing/",
+      },
+    ],
+  },
+  {
+    id: "countdown-worker",
+    title: "Web Worker 倒计时",
+    excerpt: "将倒计时逻辑移入 Web Worker，保持主线程繁忙时依然准确的计时体验。",
+    keywords: ["倒计时", "Web Worker", "性能"],
+    Component: CountdownTimerSnippet,
+    detail: {
+      overview:
+        "倒计时状态完全交由 Web Worker 管理，主线程只负责渲染 UI。当页面执行动画、网络请求或重渲染时，计时仍然精确，适合番茄钟、抢购倒计时等高可靠场景。",
+      implementation: [
+        "Worker 中以 setInterval 维护剩余秒数，所有状态变化统一通过 postMessage 推送至主线程。",
+        "主线程以消息驱动的方式同步倒计时状态、总时长与时间戳，并根据状态变化生成操作日志。",
+        "React 组件提供滑块与预设快捷键控制目标时长，并在运行时禁用可修改项防止状态错乱。",
+        "控制按钮会向 Worker 发送 start/pause/resume/reset 指令，保持操作与计时逻辑解耦。",
+      ],
+      notes: [
+        "若需要声音提醒或通知，可在收到 Worker 的 finished 状态时触发，避免在 Worker 内直接操作 DOM。",
+        "在页面卸载或组件销毁时记得 terminate Worker，避免后台持续计时造成资源浪费。",
+      ],
+    },
+    codeExamples: [
+      {
+        name: "Worker 端计时循环",
+        language: "ts",
+        code: `ctx.addEventListener("message", (event) => {
+  if (event.data.type === "start") {
+    totalSeconds = Math.floor(event.data.payload.duration)
+    remainingSeconds = totalSeconds
+    status = totalSeconds > 0 ? "running" : "finished"
+    ctx.postMessage({ type: "update", payload: { status, total: totalSeconds, remaining: remainingSeconds, timestamp: Date.now() } })
+    scheduleTick()
+  }
+})
+
+const scheduleTick = () => {
+  clearInterval(timer)
+  if (status !== "running") return
+
+  timer = ctx.setInterval(() => {
+    remainingSeconds = Math.max(remainingSeconds - 1, 0)
+    const nextStatus = remainingSeconds === 0 ? "finished" : "running"
+    if (nextStatus !== status) status = nextStatus
+    ctx.postMessage({ type: "update", payload: { status, total: totalSeconds, remaining: remainingSeconds, timestamp: Date.now() } })
+    if (remainingSeconds === 0) clearInterval(timer)
+  }, 1000)
+}`,
+      },
+      {
+        name: "组件内接收 Worker 状态",
+        language: "tsx",
+        code: `useEffect(() => {
+  const worker = new Worker(new URL("./countdown.worker.ts", import.meta.url), { type: "module" })
+  workerRef.current = worker
+
+  const handleMessage = (event: MessageEvent<CountdownWorkerMessage>) => {
+    if (event.data.type !== "update") return
+    const { status, remaining, total } = event.data.payload
+    setStatus(status)
+    setRemainingSeconds(remaining)
+    setTotalSeconds(total)
+  }
+
+  worker.addEventListener("message", handleMessage)
+  return () => {
+    worker.removeEventListener("message", handleMessage)
+    worker.terminate()
+  }
+}, [])
+
+const postCommand = (command: CountdownWorkerCommand) => {
+  workerRef.current?.postMessage(command)
+}`,
+      },
+    ],
+    resources: [
+      {
+        title: "MDN: Web Workers API",
+        url: "https://developer.mozilla.org/zh-CN/docs/Web/API/Web_Workers_API/Using_web_workers",
+      },
+      {
+        title: "Vite 官方文档：Web Workers",
+        url: "https://cn.vitejs.dev/guide/features.html#web-workers",
       },
     ],
   },
