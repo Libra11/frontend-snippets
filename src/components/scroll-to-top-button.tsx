@@ -11,6 +11,7 @@ type ScrollToTopButtonProps = {
   className?: string;
   buttonClassName?: string;
   getScrollContainer?: () => HTMLElement | null;
+  mode?: "page" | "container";
 };
 
 export function ScrollToTopButton({
@@ -18,6 +19,7 @@ export function ScrollToTopButton({
   className,
   buttonClassName,
   getScrollContainer,
+  mode = "page",
 }: ScrollToTopButtonProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [scrollContainer, setScrollContainer] = useState<HTMLElement | null>(null);
@@ -104,13 +106,13 @@ export function ScrollToTopButton({
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const wrapperClassName =
+    mode === "container"
+      ? "pointer-events-none absolute bottom-4 right-4 z-20 flex"
+      : "pointer-events-none fixed bottom-6 right-6 z-40 flex sm:bottom-8 sm:right-8";
+
   return (
-    <div
-      className={cn(
-        "pointer-events-none fixed bottom-6 right-6 z-40 flex sm:bottom-8 sm:right-8",
-        className,
-      )}
-    >
+    <div className={cn(wrapperClassName, className)}>
       <Button
         type="button"
         size="icon"
