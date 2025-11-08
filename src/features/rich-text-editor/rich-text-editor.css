@@ -1,0 +1,153 @@
+.tiptap {
+  min-height: 220px;
+}
+
+.tiptap ul,
+.tiptap ol {
+  margin: 0.75rem 0;
+  padding-left: 1.5rem;
+}
+
+.tiptap ul {
+  list-style-type: disc;
+}
+
+.tiptap ol {
+  list-style-type: decimal;
+}
+
+.tiptap blockquote {
+  position: relative;
+  margin: 1rem 0;
+  padding: 0.75rem 1rem;
+  border-left: 3px solid #1f1f1f;
+  border-radius: 0.5rem;
+  background-color: #f5f5f5;
+  color: #1f1f1f;
+  font-style: italic;
+}
+
+.dark .tiptap blockquote {
+  background-color: #262626;
+  border-left-color: #4b5563;
+  color: #f5f5f5;
+}
+
+.tiptap a {
+  color: #111827;
+  text-decoration: underline;
+  text-decoration-color: #4b5563;
+  text-underline-offset: 0.2em;
+  font-weight: 500;
+  transition: color 0.15s ease, background-color 0.15s ease,
+    text-decoration-color 0.15s ease;
+}
+
+.tiptap a:hover {
+  color: #0f172a;
+  background-color: #e5e7eb;
+  text-decoration-color: #1f2937;
+}
+
+.dark .tiptap a {
+  color: #f4f4f5;
+  text-decoration-color: #9ca3af;
+}
+
+.dark .tiptap a:hover {
+  color: #f9fafb;
+  background-color: #27272a;
+  text-decoration-color: #e5e7eb;
+}
+
+.tiptap pre {
+  margin: 1rem 0;
+  padding: 0.9rem 1.1rem;
+  overflow-x: auto;
+  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco,
+    Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 0.86rem;
+  border-radius: 0.5rem;
+  border: 1px solid #3f3f46;
+  background-color: #1f1f1f;
+  color: #f5f5f5;
+  box-shadow: 0 8px 20px -16px rgba(0, 0, 0, 0.45);
+}
+
+.tiptap pre code {
+  display: block;
+  padding: 0;
+  background-color: transparent;
+  color: inherit;
+  font-size: inherit;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.dark .tiptap pre {
+  background-color: #18181b;
+  border-color: #4b5563;
+  color: #f4f4f5;
+}
+
+.tiptap code {
+  padding: 0.18rem 0.35rem;
+  border-radius: 0.3rem;
+  font-size: 0.86rem;
+  background-color: #e5e5e5;
+  color: #111827;
+}
+
+.dark .tiptap code {
+  background-color: #27272a;
+  color: #f4f4f5;
+}
+
+.tiptap table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  border: 1px solid #d4d4d8;
+  background-color: #ffffff;
+  box-shadow: inset 0 0 0 1px #e4e4e7;
+}
+
+.tiptap th,
+.tiptap td {
+  padding: 0.6rem 0.8rem;
+  border: 1px solid #e5e7eb;
+  text-align: left;
+  vertical-align: top;
+  background-color: #f9fafb;
+  color: #111827;
+}
+
+.dark .tiptap th,
+.dark .tiptap td {
+  background-color: #1f1f1f;
+  border-color: #3f3f46;
+  color: #e5e5e5;
+}
+
+.tiptap thead th {
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.035em;
+  background-color: #f3f4f6;
+  color: #1f1f1f;
+}
+
+.dark .tiptap thead th {
+  background-color: #2c2c2c;
+  color: #f4f4f5;
+}
+
+.tiptap tbody tr:nth-child(even) {
+  background-color: #f4f4f5;
+}
+
+.dark .tiptap tbody tr:nth-child(even) {
+  background-color: #262626;
+}
