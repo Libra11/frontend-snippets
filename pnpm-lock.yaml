@@ -80,6 +80,9 @@ dependencies:
   lucide-react:
     specifier: ^0.552.0
     version: 0.552.0(react@19.2.0)
+  nanoid:
+    specifier: ^5.1.6
+    version: 5.1.6
   next-themes:
     specifier: ^0.4.6
     version: 0.4.6(react-dom@19.2.0)(react@19.2.0)
@@ -92,6 +95,9 @@ dependencies:
   react-dom:
     specifier: ^19.1.1
     version: 19.2.0(react@19.2.0)
+  react-dropzone:
+    specifier: ^14.3.8
+    version: 14.3.8(react@19.2.0)
   react-hook-form:
     specifier: ^7.66.0
     version: 7.66.0(react@19.2.0)
@@ -2462,6 +2468,11 @@ packages:
       tslib: 2.8.1
     dev: false
 
+  /attr-accept@2.2.5:
+    resolution: {integrity: sha512-0bDNnY/u6pPwHDMoF0FieU354oBi0a8rD9FcsLwzcGWbc8KS8KPIi7y+s13OlVY+gMWc/9xEMUgNE6Qm8ZllYQ==}
+    engines: {node: '>=4'}
+    dev: false
+
   /bail@2.0.2:
     resolution: {integrity: sha512-0xO6mYd7JB2YesxDKplafRpsiOzPt9V02ddPCLbY1xYGPOX24NTyN50qnUxgCPcSoYMhKpAuBTjQoRZCAkUDRw==}
     dev: false
@@ -2868,6 +2879,13 @@ packages:
     dependencies:
       flat-cache: 4.0.1
     dev: true
+
+  /file-selector@2.1.2:
+    resolution: {integrity: sha512-QgXo+mXTe8ljeqUFaX3QVHc5osSItJ/Km+xpocx0aSqWGMSCf6qYs/VnzZgS864Pjn5iceMRFigeAV7AfTlaig==}
+    engines: {node: '>= 12'}
+    dependencies:
+      tslib: 2.8.1
+    dev: false
 
   /fill-range@7.1.1:
     resolution: {integrity: sha512-YsGpe3WHLK8ZYi4tWDg2Jy3ebRz2rXowDxnld4bkQB00cc/1Zw9AWnC0i9ztDJitivtQvaI9KaLyKrc+hBW0yg==}
@@ -3761,6 +3779,12 @@ packages:
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
 
+  /nanoid@5.1.6:
+    resolution: {integrity: sha512-c7+7RQ+dMB5dPwwCp4ee1/iV/q2P6aK1mTZcfr1BTuVlyW9hJYiMPybJCcnBlQtuSmTIWNeazm/zqNoZSSElBg==}
+    engines: {node: ^18 || >=20}
+    hasBin: true
+    dev: false
+
   /natural-compare@1.4.0:
     resolution: {integrity: sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==}
     dev: true
@@ -4058,6 +4082,18 @@ packages:
     dependencies:
       react: 19.2.0
       scheduler: 0.27.0
+    dev: false
+
+  /react-dropzone@14.3.8(react@19.2.0):
+    resolution: {integrity: sha512-sBgODnq+lcA4P296DY4wacOZz3JFpD99fp+hb//iBO2HHnyeZU3FwWyXJ6salNpqQdsZrgMrotuko/BdJMV8Ug==}
+    engines: {node: '>= 10.13'}
+    peerDependencies:
+      react: '>= 16.8 || 18.0.0'
+    dependencies:
+      attr-accept: 2.2.5
+      file-selector: 2.1.2
+      prop-types: 15.8.1
+      react: 19.2.0
     dev: false
 
   /react-hook-form@7.66.0(react@19.2.0):
