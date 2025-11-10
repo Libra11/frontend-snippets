@@ -5,14 +5,16 @@
  * @Description:
  */
 import type { SnippetDefinition } from "./types";
-import { CopyToClipboardSnippet } from "./copy-to-clipboard";
 import { CommandPaletteSnippet } from "./command-palette";
+import { CodeEditorSnippet } from "./code-editor";
+import { CopyToClipboardSnippet } from "./copy-to-clipboard";
 import { DebounceThrottleInputSnippet } from "./debounce-throttle-input";
 import { CountdownTimerSnippet } from "./countdown-timer";
 import { DraggableSortableListSnippet } from "./draggable-sortable-list";
 import { DataRequestStatusSnippet } from "./data-request-status";
 import { DynamicFormSnippet } from "./dynamic-form";
 import { FileUploadPanelSnippet } from "./file-upload-panel";
+import { I18nLanguageSwitcherSnippet } from "./i18n-language-switcher";
 import { LazyImageGallerySnippet } from "./image-lazy-load";
 import { NotificationToastsSnippet } from "./notification-toasts";
 import { QrGeneratorSnippet } from "./qr-generator";
@@ -149,6 +151,140 @@ const message = feedback?.status === "success" ? "复制成功" : "复制失败"
       {
         title: "shadcn/ui Command 组件",
         url: "https://ui.shadcn.com/docs/components/command",
+      },
+    ],
+  },
+  {
+    id: "code-editor",
+    title: "代码编辑器",
+    excerpt: "集成 Monaco Editor，提供语言模板、主题切换、迷你地图、自动换行与格式化等控制，打造类 VS Code 的在线编辑体验。",
+    keywords: ["Monaco Editor", "代码编辑器", "在线 IDE", "配置面板"],
+    Component: CodeEditorSnippet,
+    detail: {
+      overview:
+        "利用 @monaco-editor/react 封装 VS Code 核心，实现一个具备模板切换、主题联动、字体尺寸调节与常用操作（格式化、复制、重置）的代码编辑面板，适合配置中心、脚本运行台等场景。",
+      implementation: [
+        "准备多份语言模板示例，通过 useState 维护当前选中的模板以及用户编辑后的内容，实现不同文件的快速切换与独立暂存。",
+        "借助 useTheme 获取站点当前主题，并提供“系统/浅色/深色”三种模式，自动映射到 Monaco 的 vs-light / vs-dark 主题。",
+        "通过 useMemo 组合自动布局、字体大小、迷你地图、行号和自动换行等配置，传递给 Monaco Editor 的 options 属性以保持性能。",
+        "在 onMount 中持有 editor 实例，调用 editor.action.formatDocument 完成格式化，同时结合 Clipboard API 实现一键复制与重置为示例内容。",
+      ],
+      notes: [
+        "如果在 SSR/动态导入环境（如 Next.js）使用 Monaco，需要在客户端渲染时再加载 @monaco-editor/react；本示例基于 Vite 可直接使用。",
+        "生产环境可对输入做安全限制，例如只开放允许的语言、限制最大行数或者结合 JSON Schema 校验配置内容。",
+      ],
+    },
+    codeExamples: [
+      {
+        name: "组合编辑器配置",
+        language: "ts",
+        code: `const editorOptions = useMemo(
+  () => ({
+    automaticLayout: true,
+    fontSize,
+    minimap: { enabled: showMinimap },
+    wordWrap: wordWrap ? "on" : "off",
+    lineNumbers: showLineNumbers ? "on" : "off",
+    padding: { top: 16, bottom: 16 },
+  }),
+  [fontSize, showLineNumbers, showMinimap, wordWrap],
+)`,
+      },
+      {
+        name: "触发 Monaco 格式化命令",
+        language: "ts",
+        code: `const handleFormat = async () => {
+  const action = editorRef.current?.getAction("editor.action.formatDocument")
+  if (!action) {
+    toast.info("当前语言不支持自动格式化")
+    return
+  }
+  await action.run()
+  toast.success("已格式化当前代码")
+}`,
+      },
+    ],
+    resources: [
+      {
+        title: "@monaco-editor/react 文档",
+        url: "https://github.com/suren-atoyan/monaco-react",
+      },
+      {
+        title: "Monaco Editor Playground",
+        url: "https://microsoft.github.io/monaco-editor/playground.html",
+      },
+      {
+        title: "VS Code 官方语言特性概览",
+        url: "https://code.visualstudio.com/docs/languages/overview",
+      },
+    ],
+  },
+  {
+    id: "i18n-language-switcher",
+    title: "国际化语言切换器",
+    excerpt: "使用 i18next 搭配 Intl API 构建多语言切换控制台，演示语言包按需加载、日期与货币格式化以及缺失文案回退策略。",
+    keywords: ["i18n", "i18next", "Intl", "多语言"],
+    Component: I18nLanguageSwitcherSnippet,
+    detail: {
+      overview:
+        "封装独立的 i18next 实例管理语言包，结合 react-i18next 与 Intl 原生 API 构建一个可视化语言切换面板：支持按需加载语言包、展示日期/货币/相对时间的本地化效果，并在缺失翻译时自动回退到英文。",
+      implementation: [
+        "通过 `createInstance` + `initReactI18next` 创建局部 i18n 实例，避免与应用其它部分冲突，并设置 `fallbackLng` 与 `returnEmptyString: false` 保证回退行为一致。",
+        "维护 `LANGUAGE_PACKS` 配置，在用户切换语言时按需调用 `addResourceBundle` 模拟异步加载语言包，再执行 `changeLanguage` 更新界面。",
+        "使用 `Intl.DateTimeFormat`、`Intl.NumberFormat` 与 `Intl.RelativeTimeFormat` 同步展示日期、货币、相对时间在不同语言下的格式差异。",
+        "通过 `i18n.getResource` 判断是否存在指定文案，实时提示当前语言是否触发英文回退，帮助排查缺失的翻译键值。",
+      ],
+      notes: [
+        "实际项目可改为从远程 JSON/后端接口加载语言包，可结合 i18next-http-backend 或 Suspense 进行懒加载。",
+        "在 SSR 或微前端场景下，需要在服务器端与客户端分别初始化 i18n；本示例通过局部实例解决重复初始化问题。",
+      ],
+    },
+    codeExamples: [
+      {
+        name: "按需加载语言包",
+        language: "ts",
+        code: `const loadLanguagePack = async (nextLanguage: LanguageCode) => {
+  setIsLoading(true)
+  if (!i18n.hasResourceBundle(nextLanguage, "translation")) {
+    await new Promise((resolve) => setTimeout(resolve, 420))
+    i18n.addResourceBundle(
+      nextLanguage,
+      "translation",
+      LANGUAGE_PACKS[nextLanguage].translation,
+      true,
+      true,
+    )
+  }
+  await i18n.changeLanguage(nextLanguage)
+  setIsLoading(false)
+}`,
+      },
+      {
+        name: "Intl 日期与货币格式化",
+        language: "ts",
+        code: `const localizedDate = new Intl.DateTimeFormat(locale, {
+  dateStyle: "full",
+  timeStyle: "short",
+}).format(sampleDate)
+
+const localizedCurrency = new Intl.NumberFormat(locale, {
+  style: "currency",
+  currency,
+}).format(sampleRevenue)`,
+      },
+    ],
+    resources: [
+      {
+        title: "i18next 官方文档",
+        url: "https://www.i18next.com/",
+      },
+      {
+        title: "react-i18next 指南",
+        url: "https://react.i18next.com/",
+      },
+      {
+        title: "MDN: Intl API",
+        url: "https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Intl",
       },
     ],
   },
