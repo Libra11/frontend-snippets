@@ -9,6 +9,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { ThemeColorToggle } from "@/components/theme-color-toggle";
 import { ScrollToTopButton } from "@/components/scroll-to-top-button";
 
 export function AppShell({ children }: PropsWithChildren) {
@@ -40,22 +41,8 @@ export function AppShell({ children }: PropsWithChildren) {
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <nav className="hidden items-center gap-6 text-sm text-muted-foreground md:flex">
-                <a className="transition hover:text-foreground" href="#hero">
-                  项目介绍
-                </a>
-                <a
-                  className="transition hover:text-foreground"
-                  href="#snippets"
-                >
-                  功能合集
-                </a>
-                <a className="transition hover:text-foreground" href="#fresh">
-                  最新功能
-                </a>
-              </nav>
-
               <div className="flex items-center gap-3">
+                <ThemeColorToggle />
                 <ThemeToggle />
                 <Badge
                   variant="secondary"
@@ -63,11 +50,6 @@ export function AppShell({ children }: PropsWithChildren) {
                 >
                   Tailwind + shadcn/ui
                 </Badge>
-                <Button variant="outline" size="sm" asChild>
-                  <a href="#snippets" className="flex items-center gap-1">
-                    <span>浏览组件</span>
-                  </a>
-                </Button>
               </div>
             </div>
           </header>
