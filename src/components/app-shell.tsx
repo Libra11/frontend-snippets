@@ -6,7 +6,6 @@
  */
 import type { PropsWithChildren } from "react";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { ThemeColorToggle } from "@/components/theme-color-toggle";
