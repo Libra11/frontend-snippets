@@ -29,6 +29,10 @@ import { ChartTemplatesSnippet } from "./chart-templates";
 import { MasonryLayoutSnippet } from "./masonry-layout";
 import { AnchorFileDownloadSnippet } from "./anchor-file-download";
 import { LoadMoreOnScrollSnippet } from "./load-more-on-scroll";
+import { ScreenShareSnippet } from "./screen-share";
+import { CameraCaptureSnippet } from "./camera-capture";
+import { PreventButtonSpamSnippet } from "./prevent-button-spam";
+import { PaginationControlsSnippet } from "./pagination-controls";
 
 export const snippets: SnippetDefinition[] = [
   {
@@ -1006,6 +1010,297 @@ return (
       {
         title: "MDN: Blob",
         url: "https://developer.mozilla.org/zh-CN/docs/Web/API/Blob",
+      },
+    ],
+  },
+  {
+    id: "camera-capture",
+    title: "摄像头捕获与拍照",
+    excerpt:
+      "调用 `navigator.mediaDevices.getUserMedia` 打开摄像头，实时预览并生成 PNG 快照，附带分辨率/前后摄选择与相册管理。",
+    keywords: ["摄像头", "拍照", "WebRTC", "Canvas"],
+    Component: CameraCaptureSnippet,
+    detail: {
+      overview:
+        "通过 getUserMedia 获取 MediaStream，渲染到 video 元素中，并结合 canvas 将当前帧导出为图片存入相册，可自定义分辨率、镜像效果与前/后摄，同时处理权限异常与资源释放。",
+      implementation: [
+        "检测浏览器对 getUserMedia 的支持情况并维护 `CameraStatus`，在“开启摄像头”按钮点击后，根据分辨率和 facingMode 组装约束发起请求。",
+        "成功获取流后将其赋值给 video.srcObject 并播放，用户可以切换镜像效果以匹配前置摄像头的体验；停止时调用 track.stop() 释放资源。",
+        "拍照按钮通过 canvas.drawImage(video) 抓取当前帧并转成 `canvas.toDataURL()` 存入相册，记录捕获时间与分辨率，提供下载/删除/清空操作。",
+        "组件卸载或重新请求时及时停止旧流，避免摄像头持续占用；错误提示区展示权限拒绝、设备被占用等异常信息。",
+      ],
+      notes: [
+        "摄像头访问需 HTTPS 或 localhost 环境，且必须在用户交互后触发 getUserMedia。",
+        "若设备不存在后置摄像头（例如桌面），facingMode=environment 可能会忽略，可在实际项目中通过 enumerateDevices 做更细粒度判断。",
+        "持续抓帧需关注内存占用，可以限制相册数量或使用 URL.createObjectURL + revokeObjectURL。",
+      ],
+    },
+    codeExamples: [
+      {
+        name: "开启摄像头",
+        language: "ts",
+        code: `const startCamera = async () => {
+  setStatus("requesting")
+  const constraints: MediaStreamConstraints = {
+    video: {
+      width: { ideal: preset.width },
+      height: { ideal: preset.height },
+      facingMode,
+    },
+    audio: false,
+  }
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia(constraints)
+    setStream(stream)
+    setStatus("streaming")
+  } catch (error) {
+    setStatus("idle")
+    setError("用户拒绝或设备被占用")
+  }
+}`,
+      },
+      {
+        name: "抓取当前帧生成 PNG",
+        language: "ts",
+        code: `const capturePhoto = () => {
+  if (!videoRef.current) return
+  const canvas = document.createElement("canvas")
+  canvas.width = videoRef.current.videoWidth
+  canvas.height = videoRef.current.videoHeight
+  const ctx = canvas.getContext("2d")
+  ctx?.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height)
+  const dataUrl = canvas.toDataURL("image/png")
+  setShots((prev) => [{ id: crypto.randomUUID(), dataUrl }, ...prev])
+}`,
+      },
+    ],
+    resources: [
+      {
+        title: "MDN: MediaDevices.getUserMedia()",
+        url: "https://developer.mozilla.org/zh-CN/docs/Web/API/MediaDevices/getUserMedia",
+      },
+      {
+        title: "MDN: CanvasRenderingContext2D.drawImage()",
+        url: "https://developer.mozilla.org/zh-CN/docs/Web/API/CanvasRenderingContext2D/drawImage",
+      },
+      {
+        title: "web.dev: Camera capture",
+        url: "https://web.dev/articles/media-capturing-images",
+      },
+    ],
+  },
+  {
+    id: "prevent-button-spam",
+    title: "按钮冷却防连击",
+    excerpt:
+      "为关键操作按钮加上冷却时间与全局/单项模式选择，防止用户短时间内重复触发接口。",
+    keywords: ["按钮", "防抖", "冷却", "交互反馈"],
+    Component: PreventButtonSpamSnippet,
+    detail: {
+      overview:
+        "用局部状态维护按钮的剩余冷却秒数，点击后启动 `setInterval` 递减并禁用按钮，支持单个动作与全局共用两种模式，同时可以切换冷却结束后的恢复方式，适合需要防止连点的敏感操作。",
+      implementation: [
+        "定义 `cooldowns` 字典记录每个按钮（或全局）的 `remaining` 与 `status`，点击按钮时检查当前状态是否仍在冷却中。",
+        "启动冷却时创建定时器，每秒递减剩余时间，归零后依据 autoReset 决定恢复到 idle 还是 success（提示需要再次确认）。",
+        "支持“强制全局冷却”开关：启用后所有按钮共用同一冷却状态，方便演示不同策略对交互的影响。",
+        "组件卸载或冷却结束时及时清理 timer，防止内存泄漏；UI 通过 Badge、文案、倒计时与 Loader 状态反馈避免用户误操作。",
+      ],
+      notes: [
+        "冷却逻辑适合放在前端保证体验，但关键接口仍应在服务端去重（如请求幂等键或乐观锁）。",
+        "如果按钮会触发路由跳转，记得在离开页面前清理定时器。",
+        "可以把冷却信息持久化到 localStorage 或后端，以跨标签页共享状态。",
+      ],
+    },
+    codeExamples: [
+      {
+        name: "启动冷却并更新状态",
+        language: "ts",
+        code: `const startCooldown = (id: string, duration: number) => {
+  setCooldowns((prev) => ({
+    ...prev,
+    [id]: { remaining: duration, status: "cooling" },
+  }))
+  const timer = window.setInterval(() => {
+    setCooldowns((prev) => {
+      const next = prev[id]
+      if (!next) return prev
+      if (next.remaining <= 1) {
+        clearInterval(timer)
+        return { ...prev, [id]: { remaining: 0, status: "idle" } }
+      }
+      return { ...prev, [id]: { remaining: next.remaining - 1, status: "cooling" } }
+    })
+  }, 1000)
+}`,
+      },
+      {
+        name: "按钮点击时检查冷却",
+        language: "ts",
+        code: `const handleClick = (variant: ButtonVariant) => {
+  const state = cooldowns[variant.id] ?? { remaining: 0, status: "idle" }
+  if (state.status === "cooling") {
+    return
+  }
+  startCooldown(variant.id, variant.cooldown)
+  // 执行业务逻辑
+}`,
+      },
+    ],
+    resources: [
+      {
+        title: "React Docs: State and Effects",
+        url: "https://react.dev/learn/state-a-components-memory",
+      },
+      {
+        title: "MDN: setInterval/clearInterval",
+        url: "https://developer.mozilla.org/zh-CN/docs/Web/API/setInterval",
+      },
+      {
+        title: "Designing for failure: preventing duplicate submissions",
+        url: "https://uxdesign.cc/preventing-duplicate-form-submissions",
+      },
+    ],
+  },
+  {
+    id: "pagination-controls",
+    title: "分页控制组件",
+    excerpt:
+      "包含页码、快速跳转、每页数量切换与数据集预设的分页控制条，适配后台列表或数据集页面。",
+    keywords: ["分页", "列表", "页码", "UX"],
+    Component: PaginationControlsSnippet,
+    detail: {
+      overview:
+        "结合总数和每页数量计算页数，提供上一页/下一页、页码按钮、省略号以及快捷跳转入口；还能在多份数据集之间切换，以展示分页组件如何响应不同总量与设定。",
+      implementation: [
+        "使用 `paginationPresets` 维护多个数据集（总条数 + 标签），切换时把当前页重置为 1。",
+        "通过 `pageSizeOptions` 切换每页数量，重新计算总页数并更新当前页；`start ~ end` 提示当前范围。",
+        "根据当前页计算页码渲染列表，边界使用 `getPageRange` 生成省略号结构，防止页码过长。",
+        "提供 `showQuickJump` 开关以及“每页 xx 条”按钮，演示后台常见的分页交互细节。",
+      ],
+      notes: [
+        "真实项目中可把分页状态放入 URL（query string）或 Redux/URL state，确保刷新与分享链接时仍可定位到当前页。",
+        "若总页数很大，可考虑输入跳页框或下拉选择分页范围。",
+        "移动端可隐藏部分元素或改为上/下页按钮 + 当前页指示，以避免拥挤。",
+      ],
+    },
+    codeExamples: [
+      {
+        name: "计算页码列表",
+        language: "ts",
+        code: `function getPageRange(current: number, totalPages: number) {
+  const delta = 1
+  const rangeWithDots: (number | string)[] = [1]
+  for (let i = Math.max(2, current - delta); i <= Math.min(totalPages - 1, current + delta); i++) {
+    rangeWithDots.push(i)
+  }
+  if (current - delta > 2) rangeWithDots.splice(1, 0, "...")
+  if (current + delta < totalPages - 1) rangeWithDots.push("...")
+  rangeWithDots.push(totalPages)
+  return rangeWithDots
+}`,
+      },
+      {
+        name: "切换分页状态",
+        language: "ts",
+        code: `const totalPages = Math.ceil(total / pageSize)
+const handlePageChange = (page: number) => {
+  setCurrentPage(Math.max(1, Math.min(totalPages, page)))
+}
+const start = (currentPage - 1) * pageSize + 1
+const end = Math.min(total, currentPage * pageSize)`,
+      },
+    ],
+    resources: [
+      {
+        title: "Nielsen Norman Group: Pagination vs. Infinite Scrolling",
+        url: "https://www.nngroup.com/articles/pagination-infinite-scrolling-load-more/",
+      },
+      {
+        title: "Smashing Magazine: Design better pagination",
+        url: "https://www.smashingmagazine.com/2016/03/pagination-infinite-scrolling-load-more-buttons/",
+      },
+      {
+        title: "Material Design: Pagination",
+        url: "https://m3.material.io/components/pagination/overview",
+      },
+    ],
+  },
+  {
+    id: "screen-share",
+    title: "屏幕共享控制台",
+    excerpt:
+      "调用 `navigator.mediaDevices.getDisplayMedia` 捕获桌面/窗口/浏览器标签页，提供实时预览、参数调整与异常处理。",
+    keywords: ["屏幕共享", "WebRTC", "媒体流"],
+    Component: ScreenShareSnippet,
+    detail: {
+      overview:
+        "在纯前端环境演示屏幕共享流程：检测浏览器能力、配置音频捕获与优先共享的窗口类型，触发系统弹窗完成授权后在 video 里实时预览，并展示分辨率/帧率等元数据—若浏览器或用户中止共享会自动清理流。",
+      implementation: [
+        "通过 capability 检测确保存在 `navigator.mediaDevices.getDisplayMedia`，并用 Badge 告知当前状态，缺失 API 时给出提示文案。",
+        "点击“开始共享”时组装 DisplayMediaStreamOptions，可选择是否捕获系统音频、及优先使用浏览器标签页或全屏，方便演示不同 surface。",
+        "把返回的 MediaStream 赋值给 video.srcObject 并立即播放，同时监听 videoTrack 的 `ended` 事件以侦测系统层面的终止操作。",
+        "封装 stopShare 统一停止并释放 track，组件卸载时再次清理，避免占用摄像头/屏幕权限；实时把 track.getSettings() 映射到 UI，展示分辨率与帧率。",
+      ],
+      notes: [
+        "屏幕共享需运行在安全上下文（https 或 localhost）且通常只能在用户交互后调用。",
+        "部分浏览器（如 Safari <= 16）仅支持捕获整个屏幕，且不允许同时采集系统音频，需要根据 UA 做兼容。",
+        "捕获机密内容前须提示用户并提供显眼的结束按钮，防止长时间暴露。",
+      ],
+    },
+    codeExamples: [
+      {
+        name: "发起共享",
+        language: "ts",
+        code: `const startShare = async () => {
+  setStatus("requesting")
+  try {
+    const stream = await navigator.mediaDevices.getDisplayMedia({
+      video: {
+        displaySurface: preferTab ? "browser" : "monitor",
+      },
+      audio: includeAudio,
+    })
+    stream.getVideoTracks()[0]?.addEventListener("ended", () =>
+      stopShare("已在系统面板停止共享"),
+    )
+    setStream(stream)
+    setStatus("sharing")
+  } catch (error) {
+    setStatus("idle")
+    setError("用户取消或浏览器阻止了共享")
+  }
+}`,
+      },
+      {
+        name: "统一释放媒体流",
+        language: "ts",
+        code: `const stopShare = useCallback(() => {
+  setStream((current) => {
+    current?.getTracks().forEach((track) => track.stop())
+    return null
+  })
+  setStatus("idle")
+}, [])
+
+useEffect(() => {
+  return () => {
+    stream?.getTracks().forEach((track) => track.stop())
+  }
+}, [stream])`,
+      },
+    ],
+    resources: [
+      {
+        title: "MDN: Screen Capture API",
+        url: "https://developer.mozilla.org/zh-CN/docs/Web/API/Screen_Capture_API",
+      },
+      {
+        title: "MDN: MediaDevices.getDisplayMedia()",
+        url: "https://developer.mozilla.org/zh-CN/docs/Web/API/MediaDevices/getDisplayMedia",
+      },
+      {
+        title: "web.dev: Capture screen content",
+        url: "https://web.dev/articles/getdisplaymedia",
       },
     ],
   },

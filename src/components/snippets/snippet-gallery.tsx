@@ -1,15 +1,82 @@
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+
 import type { SnippetDefinition } from "@/features/types";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { SnippetCard } from "./snippet-card";
 
 type SnippetGalleryProps = {
   snippets: SnippetDefinition[];
 };
 
+const LOAD_STEP = 6;
+
 export function SnippetGallery({ snippets }: SnippetGalleryProps) {
-  const featuredKeywords = Array.from(
-    new Set(snippets.flatMap((snippet) => snippet.keywords))
-  ).slice(0, 6);
+  const [visibleCount, setVisibleCount] = useState(() =>
+    Math.min(LOAD_STEP, snippets.length)
+  );
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+
+  const featuredKeywords = useMemo(
+    () =>
+      Array.from(new Set(snippets.flatMap((snippet) => snippet.keywords))).slice(
+        0,
+        6
+      ),
+    [snippets]
+  );
+
+  useEffect(() => {
+    setVisibleCount(Math.min(LOAD_STEP, snippets.length));
+  }, [snippets.length]);
+
+  const visibleSnippets = useMemo(
+    () => snippets.slice(0, visibleCount),
+    [snippets, visibleCount]
+  );
+
+  const hasMore = visibleCount < snippets.length;
+  const progress = snippets.length
+    ? Math.round((visibleCount / snippets.length) * 100)
+    : 0;
+
+  const loadMore = useCallback(() => {
+    setVisibleCount((prev) =>
+      Math.min(prev + LOAD_STEP, snippets.length)
+    );
+  }, [snippets.length]);
+
+  useEffect(() => {
+    if (!hasMore) {
+      return;
+    }
+
+    const sentinel = sentinelRef.current;
+    if (!sentinel) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            loadMore();
+          }
+        });
+      },
+      {
+        root: null,
+        threshold: 0.2,
+        rootMargin: "160px",
+      }
+    );
+
+    observer.observe(sentinel);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [hasMore, loadMore, visibleSnippets.length]);
 
   if (snippets.length === 0) {
     return (
@@ -47,9 +114,43 @@ export function SnippetGallery({ snippets }: SnippetGalleryProps) {
       </div>
 
       <div id="fresh" className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-        {snippets.map((snippet) => (
+        {visibleSnippets.map((snippet) => (
           <SnippetCard key={snippet.id} snippet={snippet} />
         ))}
+      </div>
+
+      <div
+        ref={sentinelRef}
+        className="flex flex-col items-center gap-2 rounded-3xl border border-dashed border-border/60 bg-muted/20 px-4 py-6 text-center"
+      >
+        {hasMore ? (
+          <>
+            <p className="text-sm font-semibold text-foreground">
+              滚动即可加载更多
+            </p>
+            <p className="text-xs text-muted-foreground">
+              已展示 {visibleCount}/{snippets.length} · {progress}%
+            </p>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="mt-1"
+              onClick={loadMore}
+            >
+              继续加载
+            </Button>
+          </>
+        ) : (
+          <>
+            <p className="text-sm font-semibold text-foreground">
+              已展示全部 {snippets.length} 个功能
+            </p>
+            <p className="text-xs text-muted-foreground">
+              欢迎提出新的组件需求～
+            </p>
+          </>
+        )}
       </div>
     </section>
   );
