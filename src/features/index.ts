@@ -26,6 +26,9 @@ import { ThemeToggleSnippet } from "./theme-toggle";
 import { ThemeColorSwitcherSnippet } from "./theme-color-switcher";
 import { GlobalErrorBoundarySnippet } from "./global-error-boundary";
 import { ChartTemplatesSnippet } from "./chart-templates";
+import { MasonryLayoutSnippet } from "./masonry-layout";
+import { AnchorFileDownloadSnippet } from "./anchor-file-download";
+import { LoadMoreOnScrollSnippet } from "./load-more-on-scroll";
 
 export const snippets: SnippetDefinition[] = [
   {
@@ -850,6 +853,163 @@ const STATUS_META: Record<RequestStatus, { label: string }> = {
     ],
   },
   {
+    id: "load-more-on-scroll",
+    title: "下拉加载更多",
+    excerpt:
+      "在限定高度的 Feed 内设置滚动监听，列表滑到底部后自动拉取下一批数据，并带有失败重试与手动触发入口。",
+    keywords: ["无限滚动", "IntersectionObserver", "下拉加载"],
+    Component: LoadMoreOnScrollSnippet,
+    detail: {
+      overview:
+        "模拟“下拉加载更多”体验：容器内嵌一个 sentinel，借助 IntersectionObserver 监听其可见性，一旦出现在视口内即触发模拟请求；加载成功时拼接下一批卡片，失败则展示错误提示并允许继续下拉或点击按钮重试。",
+      implementation: [
+        "准备 16 条增长动态，并按 `LOAD_STEP` 切片；`visibleCount` 控制当前展示条数，配合进度条提示已加载比例。",
+        "自定义 `loadStatus`（idle/loading/error），`setTimeout` 模拟远端延迟并以 18% 概率抛错，展示真实的失败场景。",
+        "以容器元素作为 IntersectionObserver 的 root，监听底部 sentinel；当 `hasMore` 为 false 时自动注销监听，避免重复请求。",
+        "提供手动 `Button` 作为兜底入口，若浏览器不支持 IntersectionObserver 或用户关闭自动加载时仍可点击追加数据。",
+      ],
+      notes: [
+        "长列表需要及时解绑 IntersectionObserver 并在组件卸载时清理定时器，防止内存泄漏。",
+        "在真实接口中应避免一次性加载过多数据，可结合分页 token 或 cursor；同时做好空列表与“到底了”的视觉反馈。",
+        "如需兼容旧浏览器，可在不支持 IntersectionObserver 时自动降级为按钮触发方案。",
+      ],
+    },
+    codeExamples: [
+      {
+        name: "IntersectionObserver 监听底部",
+        language: "ts",
+        code: `useEffect(() => {
+  if (!hasMore) return
+  const container = containerRef.current
+  const sentinel = sentinelRef.current
+  if (!container || !sentinel) return
+  const observer = new IntersectionObserver(
+    (entries) => {
+      if (entries[0]?.isIntersecting) {
+        loadMore()
+      }
+    },
+    { root: container, threshold: 0.15, rootMargin: "80px" },
+  )
+  observer.observe(sentinel)
+  return () => observer.disconnect()
+}, [hasMore, loadMore])`,
+      },
+      {
+        name: "模拟拉取下一批数据",
+        language: "ts",
+        code: `const loadMore = useCallback(() => {
+  if (!hasMore || status === "loading") return
+  setStatus("loading")
+  setError(null)
+  timeoutRef.current = window.setTimeout(() => {
+    const shouldFail = Math.random() < 0.18
+    if (shouldFail) {
+      setStatus("error")
+      setError("网络抖动，请重试")
+      return
+    }
+    setVisibleCount((prev) => Math.min(prev + LOAD_STEP, total))
+    setStatus("idle")
+  }, 900)
+}, [hasMore, status, total])`,
+      },
+    ],
+    resources: [
+      {
+        title: "MDN: IntersectionObserver",
+        url: "https://developer.mozilla.org/zh-CN/docs/Web/API/Intersection_Observer_API",
+      },
+      {
+        title: "web.dev: Infinite scroll UX",
+        url: "https://web.dev/learn/pwa/infinite-scroll",
+      },
+      {
+        title: "CSS-Tricks: Infinite Scrolling Article Lists",
+        url: "https://css-tricks.com/infinite-scrolling-article-listing/",
+      },
+    ],
+  },
+  {
+    id: "anchor-file-download",
+    title: "a 标签下载文件",
+    excerpt:
+      "在浏览器里生成 JSON/CSV/Markdown 三种导出格式，通过 Blob → ObjectURL → <a download> 串联即可保存文件。",
+    keywords: ["下载", "Blob", "a 标签", "文件导出"],
+    Component: AnchorFileDownloadSnippet,
+    detail: {
+      overview:
+        "展示纯前端导出流程：根据面板的开关把数据做匿名化或追加洞察，随后把字符串封装为 Blob，创建临时 URL 赋给 anchor 标签并配上 download 属性，用户点击即可触发浏览器的保存面板。",
+      implementation: [
+        "准备数据集（产品、负责人、指标等）并提供“包含洞察/匿名化负责人”的开关，让导出内容存在实际差异，便于验证下载结果。",
+        "useMemo 根据当前配置生成 JSON、CSV、Markdown 三种字符串，并立刻转成 `new Blob([...], { type })`，同时保留文件名、描述和大小元数据。",
+        "useEffect 遍历生成的 Blob，调用 `URL.createObjectURL` 得到临时链接，存入本地状态并在 cleanup 中统一 revoke，避免内存泄漏。",
+        "Button 通过 `asChild` 包裹 `<a download>`，href 直接指向对象 URL，hover/click 时浏览器会遵循 download 属性弹出保存对话框。",
+      ],
+      notes: [
+        "download 属性仅在同源资源或 `blob:`/`data:` URL 生效；跨域文件若未设置响应头，浏览器可能直接导航。",
+        "Safari < 13 对 download 支持不佳，可在点击时 fallback 到 `fetch -> FileReader -> window.open` 方案。",
+        "记得在组件卸载或文件重新生成时 revoke 不再使用的 ObjectURL，长期保留会占用内存。",
+      ],
+    },
+    codeExamples: [
+      {
+        name: "生成 Blob 与文件名",
+        language: "ts",
+        code: `const csvContent = [
+  ["产品", "负责人", "营收"].join(","),
+  ...records.map((item) => [
+    item.product,
+    maskOwner ? "Team" : item.owner,
+    item.revenue,
+  ].join(",")),
+].join("\\n")
+
+const exportFiles = [
+  {
+    id: "csv",
+    fileName: \`growth-report-\${Date.now()}.csv\`,
+    blob: new Blob([csvContent], { type: "text/csv;charset=utf-8" }),
+  },
+]`,
+      },
+      {
+        name: "a 标签触发下载",
+        language: "tsx",
+        code: `useEffect(() => {
+  const urls: Record<string, string> = {}
+  exportFiles.forEach((file) => {
+    urls[file.id] = URL.createObjectURL(file.blob)
+  })
+  setFileUrls(urls)
+  return () => Object.values(urls).forEach((url) => URL.revokeObjectURL(url))
+}, [exportFiles])
+
+return (
+  <Button asChild>
+    <a href={fileUrls.csv} download={exportFiles[0].fileName}>
+      下载 CSV
+    </a>
+  </Button>
+)`,
+      },
+    ],
+    resources: [
+      {
+        title: "MDN: HTMLAnchorElement.download",
+        url: "https://developer.mozilla.org/zh-CN/docs/Web/API/HTMLAnchorElement/download",
+      },
+      {
+        title: "MDN: URL.createObjectURL()",
+        url: "https://developer.mozilla.org/zh-CN/docs/Web/API/URL/createObjectURL",
+      },
+      {
+        title: "MDN: Blob",
+        url: "https://developer.mozilla.org/zh-CN/docs/Web/API/Blob",
+      },
+    ],
+  },
+  {
     id: "notification-toasts",
     title: "通知提示合集",
     excerpt:
@@ -1429,6 +1589,102 @@ export function ScrollablePanel() {
       {
         title: "CSS Tricks: Smooth Scrolling",
         url: "https://css-tricks.com/snippets/jquery/smooth-scrolling/",
+      },
+    ],
+  },
+  {
+    id: "masonry-layout",
+    title: "瀑布流布局",
+    excerpt:
+      "基于原生 CSS 多列（columns）与 break-inside: avoid 构建的响应式瀑布流，内置分类筛选、列密度切换与信息块显隐。",
+    keywords: ["瀑布流", "Masonry", "布局", "CSS Columns"],
+    Component: MasonryLayoutSnippet,
+    detail: {
+      overview:
+        "无需引入第三方 Masonry 库，仅依靠 CSS 多列布局即可拼出灵感墙：卡片内容自然填补空隙，配合分类、列密度与信息显隐的状态切换，可快速验证瀑布流场景的交互。",
+      implementation: [
+        "预置 `masonryProjects` 数据集合，包含分类、标签、指标等字段，让每张卡片高度有差异，从而验证瀑布流对不同内容长度的适配。",
+        "通过 `columns` + `[&>*]:break-inside-avoid` 保证每张卡片作为整体落入列中，`[column-fill:_balance]` 则让浏览器自动平衡各列高度。",
+        "列密度按钮映射到 `densityPresets`，每个预设定义对应断点下的列数与 column-gap，点击后只需拼接 className 即可切换布局。",
+        "分类筛选和“展示扩展信息”开关共享一份状态：useMemo 过滤出要渲染的卡片，开关控制 metrics/tags 片段的挂载，从而真实演示内容增减带来的重排。",
+      ],
+      notes: [
+        "旧版 Safari/WebView 若 columns 支持不佳，可降级为 grid + JS 计算高度或改用 CSS masonry（实验特性）。",
+        "瀑布流会打乱竖向阅读顺序，重要信息需额外提供编号/跳转锚点，或在移动端切换成单列列表。",
+      ],
+    },
+    codeExamples: [
+      {
+        name: "列密度预设",
+        language: "ts",
+        code: `const densityPresets = [
+  {
+    id: "airy",
+    label: "宽松",
+    className: "sm:columns-2 xl:columns-3 [column-gap:1.75rem] [&>*]:mb-7",
+  },
+  {
+    id: "balanced",
+    label: "均衡",
+    className: "sm:columns-2 lg:columns-3 2xl:columns-4 [column-gap:1.25rem] [&>*]:mb-5",
+  },
+  {
+    id: "packed",
+    label: "致密",
+    className: "columns-2 sm:columns-3 lg:columns-4 [column-gap:1rem] [&>*]:mb-4",
+  },
+] as const
+
+const densityMeta = densityPresets.find((preset) => preset.id === density)!`,
+      },
+      {
+        name: "渲染瀑布流容器",
+        language: "tsx",
+        code: `const filteredProjects = useMemo(() => {
+  if (activeCategory === "all") return masonryProjects
+  return masonryProjects.filter((project) => project.category === activeCategory)
+}, [activeCategory])
+
+return (
+  <div className={cn(
+    "columns-1 [column-fill:_balance] [&>*]:break-inside-avoid transition-all",
+    densityMeta.className,
+  )}>
+    {filteredProjects.map((project) => (
+      <article key={project.id} className="rounded-3xl border p-5">
+        <header>
+          <h3 className="font-semibold">{project.title}</h3>
+          <p className="text-sm text-muted-foreground">{project.description}</p>
+        </header>
+
+        {showMeta && (
+          <dl className="mt-4 grid gap-3 rounded-2xl border border-dashed px-3 py-2 text-xs">
+            {project.metrics.map((metric) => (
+              <div key={metric.label} className="flex justify-between">
+                <span>{metric.label}</span>
+                <span className="font-semibold text-foreground">{metric.value}</span>
+              </div>
+            ))}
+          </dl>
+        )}
+      </article>
+    ))}
+  </div>
+)`,
+      },
+    ],
+    resources: [
+      {
+        title: "MDN: Using Multi-column Layouts",
+        url: "https://developer.mozilla.org/zh-CN/docs/Web/CSS/CSS_multicol_layout/Using_multicol_elements",
+      },
+      {
+        title: "CSS-Tricks: Approaches for a CSS Masonry Layout",
+        url: "https://css-tricks.com/piecing-together-approaches-for-a-css-masonry-layout/",
+      },
+      {
+        title: "web.dev Patterns: Masonry layout",
+        url: "https://web.dev/patterns/layout/masonry",
       },
     ],
   },
