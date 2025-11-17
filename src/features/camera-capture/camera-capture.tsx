@@ -22,7 +22,12 @@ const resolutionPresets = [
   { id: "square", label: "Square · 1080x1080", width: 1080, height: 1080 },
 ] as const;
 
-const capabilityFallback = {
+type CapabilityState = {
+  supported: boolean;
+  reason?: string;
+};
+
+const capabilityFallback: CapabilityState = {
   supported: false,
   reason: "当前浏览器不支持 `navigator.mediaDevices.getUserMedia`。",
 };
@@ -61,7 +66,7 @@ export function CameraCaptureSnippet() {
     useState<(typeof resolutionPresets)[number]["id"]>("hd");
   const [capturing, setCapturing] = useState(false);
 
-  const capability = useMemo(() => {
+  const capability = useMemo<CapabilityState>(() => {
     if (typeof window === "undefined") {
       return capabilityFallback;
     }
