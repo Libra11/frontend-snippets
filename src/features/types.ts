@@ -27,3 +27,5 @@ export type SnippetDefinition = {
   codeExamples?: SnippetCodeExample[];
   resources?: SnippetResource[];
 };
+
+export type SnippetMetadata = Omit<SnippetDefinition, "Component">;
