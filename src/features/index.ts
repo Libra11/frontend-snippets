@@ -35,6 +35,7 @@ import { ScrollToTopSnippet } from "./scroll-to-top";
 import { StepperFormSnippet } from "./stepper-form";
 import { ThemeColorSwitcherSnippet } from "./theme-color-switcher";
 import { ThemeToggleSnippet } from "./theme-toggle";
+import { WatermarkSnippet } from "./watermark";
 
 type ComponentMap = Record<string, SnippetDefinition["Component"]>;
 
@@ -70,6 +71,7 @@ const componentMap: ComponentMap = Object.freeze({
   "stepper-form": StepperFormSnippet,
   "theme-color-switcher": ThemeColorSwitcherSnippet,
   "theme-toggle": ThemeToggleSnippet,
+  "watermark": WatermarkSnippet,
 } as const);
 
 function attachComponent(metadata: SnippetMetadata): SnippetDefinition {

@@ -29,6 +29,7 @@ import { snippet as stepperForm } from "./snippet-data/stepper-form";
 import { snippet as themeColorSwitcher } from "./snippet-data/theme-color-switcher";
 import { snippet as themeToggle } from "./snippet-data/theme-toggle";
 import { snippet as filePreviewSnippet } from "./snippet-data/file-preview";
+import { snippet as watermark } from "./snippet-data/watermark";
 
 export const snippetMetadata: SnippetMetadata[] = [
   anchorFileDownload,
@@ -60,4 +61,5 @@ export const snippetMetadata: SnippetMetadata[] = [
   stepperForm,
   themeColorSwitcher,
   themeToggle,
+  watermark,
 ];
