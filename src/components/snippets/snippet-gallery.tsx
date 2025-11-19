@@ -91,21 +91,23 @@ export function SnippetGallery({ snippets }: SnippetGalleryProps) {
 
   return (
     <section id="snippets" className="space-y-6">
-      <div className="flex flex-col gap-6 rounded-3xl border border-border/60 bg-card/70 px-6 py-6 shadow-sm transition-colors sm:flex-row sm:items-center sm:justify-between dark:border-border/40 dark:bg-muted/20">
-        <div>
-          <h2 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+      <div className="relative flex flex-col gap-6 overflow-hidden rounded-3xl border border-border/60 bg-gradient-to-br from-card/80 to-muted/20 px-8 py-10 shadow-sm transition-colors sm:flex-row sm:items-center sm:justify-between dark:border-border/40">
+        <div className="absolute inset-0 -z-10 bg-gradient-to-r from-primary/5 via-transparent to-transparent opacity-50" />
+        
+        <div className="relative z-10 space-y-4">
+          <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
             精选小功能合集
           </h2>
-          <p className="mt-2 max-w-2xl text-sm text-muted-foreground sm:text-base">
+          <p className="max-w-2xl text-base leading-relaxed text-muted-foreground">
             所有组件均基于 Tailwind 与 shadcn/ui 打造，覆盖输入、反馈、展示、媒体等常用场景，结合实现思路与代码片段即刻复用。
           </p>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="relative z-10 flex flex-wrap items-center justify-end gap-2 sm:max-w-xs">
           {featuredKeywords.map((keyword) => (
             <Badge
               key={keyword}
               variant="secondary"
-              className="px-3 py-1 text-xs dark:bg-foreground/10 dark:text-foreground"
+              className="bg-background/60 px-3 py-1 text-xs font-medium backdrop-blur-sm transition-colors hover:bg-primary/10 hover:text-primary dark:bg-foreground/5 dark:text-foreground/80"
             >
               {keyword}
             </Badge>
