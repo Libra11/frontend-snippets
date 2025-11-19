@@ -93,7 +93,7 @@ export function SnippetCard({ snippet }: SnippetCardProps) {
         </article>
       </DialogTrigger>
 
-      <DialogContent className="max-h-[90vh] max-w-4xl overflow-y-auto rounded-3xl border-border/60 bg-background/95 p-0 backdrop-blur-xl sm:max-h-[85vh]">
+      <DialogContent className="max-h-[90vh]  overflow-y-auto rounded-3xl border-border/60 bg-background/95 p-0 backdrop-blur-xl sm:max-h-[85vh]">
         <div className="sticky top-0 z-50 flex items-center justify-between border-b border-border/40 bg-background/80 px-8 py-5 backdrop-blur-md">
           <div>
             <DialogTitle className="text-2xl font-bold tracking-tight">
