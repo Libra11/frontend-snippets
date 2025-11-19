@@ -54,7 +54,7 @@ export function ThemeToggleSnippet() {
       </div>
 
       <div className="pointer-events-none absolute -right-24 -top-24 size-52 rounded-full bg-primary/15 blur-3xl" aria-hidden />
-      <div className="pointer-events-none absolute -left-36 bottom-[-160px] size-64 rounded-full bg-secondary/20 blur-3xl" aria-hidden />
+      <div className="pointer-events-none absolute -left-36 -bottom-40 size-64 rounded-full bg-secondary/20 blur-3xl" aria-hidden />
     </div>
   );
 }

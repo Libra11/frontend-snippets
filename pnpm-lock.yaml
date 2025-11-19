@@ -17,6 +17,15 @@ dependencies:
   '@hookform/resolvers':
     specifier: ^5.2.2
     version: 5.2.2(react-hook-form@7.66.0)
+  '@js-preview/docx':
+    specifier: ^1.6.4
+    version: 1.6.4(core-js@3.47.0)
+  '@js-preview/excel':
+    specifier: ^1.7.14
+    version: 1.7.14
+  '@js-preview/pdf':
+    specifier: ^2.0.10
+    version: 2.0.10
   '@monaco-editor/react':
     specifier: ^4.7.0
     version: 4.7.0(monaco-editor@0.54.0)(react-dom@19.2.0)(react@19.2.0)
@@ -778,6 +787,22 @@ packages:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
+
+  /@js-preview/docx@1.6.4(core-js@3.47.0):
+    resolution: {integrity: sha512-F6Yzac5NWnXp7cKzcUYGSLQHdp5ELgpdgTzrj5i4QZkZHv4ASGHhVY0MZF4YRjpY/MwirD8C1W14CIRUcdvL7g==}
+    peerDependencies:
+      core-js: ^3.0.0
+    dependencies:
+      core-js: 3.47.0
+    dev: false
+
+  /@js-preview/excel@1.7.14:
+    resolution: {integrity: sha512-7QHtuRalWQzWIKARc/IRN8+kj1S5eWV4+cAQipzZngE3mVxMPL1RHXKJt/ONmpcKZ410egYkaBuOOs9+LctBkA==}
+    dev: false
+
+  /@js-preview/pdf@2.0.10:
+    resolution: {integrity: sha512-S1PYUIfHQGPqEwgGk8TQ8wf5rec2ubE7nixSd0iQGO7ecm+B7BNkAAPkotnUCNAaDo16NL+fw07mblhU3t9eZw==}
+    dev: false
 
   /@monaco-editor/loader@1.6.1:
     resolution: {integrity: sha512-w3tEnj9HYEC73wtjdpR089AqkUPskFRcdkxsiSFt3SoUc3OHpmu+leP94CXBm4mHfefmhsdfI0ZQu6qJ0wgtPg==}
@@ -2717,6 +2742,11 @@ packages:
   /convert-source-map@2.0.0:
     resolution: {integrity: sha512-Kvp459HrV2FEJ1CAsi1Ku+MY3kasH19TFykTz2xWmMeq6bk2NU3XXvfJ+Q61m0xktWwt+1HSYf3JZsTms3aRJg==}
     dev: true
+
+  /core-js@3.47.0:
+    resolution: {integrity: sha512-c3Q2VVkGAUyupsjRnaNX6u8Dq2vAdzm9iuPj5FW0fRxzlxgq9Q39MDq10IvmQSpLgHQNyQzQmOo6bgGHmH3NNg==}
+    requiresBuild: true
+    dev: false
 
   /crelt@1.0.6:
     resolution: {integrity: sha512-VQ2MBenTq1fWZUH9DJNGti7kKv6EeAuYr3cLwxUWhIu1baTaXh4Ib5W2CqHVqib4/MqbYGJqiL3Zb8GJZr3l4g==}

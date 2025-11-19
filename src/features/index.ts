@@ -18,6 +18,7 @@ import { DebounceThrottleInputSnippet } from "./debounce-throttle-input";
 import { DraggableSortableListSnippet } from "./draggable-sortable-list";
 import { DynamicFormSnippet } from "./dynamic-form";
 import { FileUploadPanelSnippet } from "./file-upload-panel";
+import { FilePreviewSnippet } from "./file-preview";
 import { GlobalErrorBoundarySnippet } from "./global-error-boundary";
 import { I18nLanguageSwitcherSnippet } from "./i18n-language-switcher";
 import { LazyImageGallerySnippet } from "./image-lazy-load";
@@ -60,6 +61,7 @@ const componentMap: ComponentMap = Object.freeze({
   "masonry-layout": MasonryLayoutSnippet,
   "notification-toasts": NotificationToastsSnippet,
   "pagination-controls": PaginationControlsSnippet,
+  "file-preview": FilePreviewSnippet,
   "prevent-button-spam": PreventButtonSpamSnippet,
   "qr-generator": QrGeneratorSnippet,
   "rich-text-editor": RichTextEditorSnippet,

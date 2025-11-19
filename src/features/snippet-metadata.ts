@@ -28,6 +28,7 @@ import { snippet as scrollToTop } from "./snippet-data/scroll-to-top";
 import { snippet as stepperForm } from "./snippet-data/stepper-form";
 import { snippet as themeColorSwitcher } from "./snippet-data/theme-color-switcher";
 import { snippet as themeToggle } from "./snippet-data/theme-toggle";
+import { snippet as filePreviewSnippet } from "./snippet-data/file-preview";
 
 export const snippetMetadata: SnippetMetadata[] = [
   anchorFileDownload,
@@ -50,6 +51,7 @@ export const snippetMetadata: SnippetMetadata[] = [
   masonryLayout,
   notificationToasts,
   paginationControls,
+  filePreviewSnippet,
   preventButtonSpam,
   qrGenerator,
   richTextEditor,
