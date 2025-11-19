@@ -21,6 +21,7 @@ import { FileUploadPanelSnippet } from "./file-upload-panel";
 import { FilePreviewSnippet } from "./file-preview";
 import { GlobalErrorBoundarySnippet } from "./global-error-boundary";
 import { I18nLanguageSwitcherSnippet } from "./i18n-language-switcher";
+import { ImageColorExtractorSnippet } from "./image-color-extractor";
 import { LazyImageGallerySnippet } from "./image-lazy-load";
 import { LoadMoreOnScrollSnippet } from "./load-more-on-scroll";
 import { MarkdownPreviewSnippet } from "./markdown-preview";
@@ -36,6 +37,7 @@ import { StepperFormSnippet } from "./stepper-form";
 import { ThemeColorSwitcherSnippet } from "./theme-color-switcher";
 import { ThemeToggleSnippet } from "./theme-toggle";
 import { WatermarkSnippet } from "./watermark";
+import { VirtualListSnippet } from "./virtual-list";
 
 type ComponentMap = Record<string, SnippetDefinition["Component"]>;
 
@@ -56,6 +58,7 @@ const componentMap: ComponentMap = Object.freeze({
   "global-error-boundary": GlobalErrorBoundarySnippet,
   "i18n-language-switcher": I18nLanguageSwitcherSnippet,
   "image-lazy-load": LazyImageGallerySnippet,
+  "image-color-extractor": ImageColorExtractorSnippet,
   "lazy-image": LazyImageGallerySnippet,
   "load-more-on-scroll": LoadMoreOnScrollSnippet,
   "markdown-preview": MarkdownPreviewSnippet,
@@ -72,6 +75,7 @@ const componentMap: ComponentMap = Object.freeze({
   "theme-color-switcher": ThemeColorSwitcherSnippet,
   "theme-toggle": ThemeToggleSnippet,
   "watermark": WatermarkSnippet,
+  "virtual-list": VirtualListSnippet,
 } as const);
 
 function attachComponent(metadata: SnippetMetadata): SnippetDefinition {

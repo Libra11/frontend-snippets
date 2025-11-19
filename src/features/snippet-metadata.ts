@@ -14,6 +14,7 @@ import { snippet as dynamicForm } from "./snippet-data/dynamic-form";
 import { snippet as fileUploadPanel } from "./snippet-data/file-upload-panel";
 import { snippet as globalErrorBoundary } from "./snippet-data/global-error-boundary";
 import { snippet as i18nLanguageSwitcher } from "./snippet-data/i18n-language-switcher";
+import { snippet as imageColorExtractor } from "./snippet-data/image-color-extractor";
 import { snippet as lazyImage } from "./snippet-data/lazy-image";
 import { snippet as loadMoreOnScroll } from "./snippet-data/load-more-on-scroll";
 import { snippet as markdownPreview } from "./snippet-data/markdown-preview";
@@ -30,6 +31,7 @@ import { snippet as themeColorSwitcher } from "./snippet-data/theme-color-switch
 import { snippet as themeToggle } from "./snippet-data/theme-toggle";
 import { snippet as filePreviewSnippet } from "./snippet-data/file-preview";
 import { snippet as watermark } from "./snippet-data/watermark";
+import { snippet as virtualList } from "./snippet-data/virtual-list";
 
 export const snippetMetadata: SnippetMetadata[] = [
   anchorFileDownload,
@@ -46,6 +48,7 @@ export const snippetMetadata: SnippetMetadata[] = [
   fileUploadPanel,
   globalErrorBoundary,
   i18nLanguageSwitcher,
+  imageColorExtractor,
   lazyImage,
   loadMoreOnScroll,
   markdownPreview,
@@ -62,4 +65,5 @@ export const snippetMetadata: SnippetMetadata[] = [
   themeColorSwitcher,
   themeToggle,
   watermark,
+  virtualList,
 ];
